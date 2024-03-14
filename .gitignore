@@ -5,8 +5,8 @@
 **/build/
 !src/**/build/
 
-# Screws up the MC dev plugin for IntelliJ..
-# src/btw/**
+# (Screws up the MC dev plugin for Older IntelliJ Versions)
+src/btw/**
 
 # Ignore local Minecraft folder
 .minecraft

@@ -42,22 +42,23 @@ java -jar libs/tiny-remapper-0.8.6+local-fat.jar "$HOME/.gradle/caches/fabric-lo
     "$HOME/.gradle/caches/fabric-loom/1.6.4/minecraft-merged-intermediary.jar" \
     "$HOME/.gradle/caches/fabric-loom/1.6.4/intermediary-v2.tiny" official intermediary > /dev/null
 
-# Extract the first argument (equivalent to %~f1) using unzip into tmp/BTW_dev
-unzip -o "$1" -d build_BTW/tmp/BTW_dev
+# Run the gradlew script to download BTW and copy the BTW jar
+./gradlew --no-daemon downloadAssets copyBtwJar
+echo "Please wait..."
 
 # Run Tiny Remapper on the extracted file
-java -jar libs/tiny-remapper-0.8.6+local-fat.jar "build_BTW/tmp/BTW_dev/BTW-CE-Intermediary.zip" \
-    "build_BTW/BTW_dev/BTW-CE-Intermediary.zip" custom_mappings/mappings/mappings.tiny intermediary named \
+java -jar libs/tiny-remapper-0.8.6+local-fat.jar "build_BTW/tmp/BTW_dev/BTW-CE-Intermediary.jar" \
+    "build_BTW/BTW_dev/BTW-CE-Intermediary.jar" custom_mappings/mappings/mappings.tiny intermediary named \
     "$HOME/.gradle/caches/fabric-loom/1.6.4/minecraft-merged-intermediary.jar" > /dev/null
 
 # Extract another Minecraft jar using unzip
 unzip -o "$HOME/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged/1.6.4-btw.community.mappings.1_6_4.$MAPPINGS_VERSION-v2/minecraft-merged-1.6.4-btw.community.mappings.1_6_4.$MAPPINGS_VERSION-v2.jar" -d build_BTW/BTW_dev
 
-# Extract the BTW-CE-Intermediary.zip using unzip
-unzip -o "build_BTW/BTW_dev/BTW-CE-Intermediary.zip" -d build_BTW/BTW_dev
+# Extract the BTW-CE-Intermediary.jar using unzip
+unzip -o "build_BTW/BTW_dev/BTW-CE-Intermediary.jar" -d build_BTW/BTW_dev
 
-# Remove the intermediary zip
-rm -f build_BTW/BTW_dev/BTW-CE-Intermediary.zip
+# Remove the intermediary jar
+rm -f build_BTW/BTW_dev/BTW-CE-Intermediary.jar
 
 # Change into the build_BTW/BTW_dev directory
 cd build_BTW/BTW_dev

@@ -27,6 +27,9 @@ repositories {
 	maven {
 		url file('mavenRepo')
 	}
+    maven {
+        url 'https://btw-community.github.io/btw-mvn/'
+    }
 	mavenCentral() //For fastutil
 }
 
@@ -63,6 +66,8 @@ dependencies {
 	implementation 'com.google.code.gson:gson:2.2.2'
 
 	implementation group: 'it.unimi.dsi', name: 'fastutil', version: '8.5.12'
+
+    implementation 'com.typesafe:config:1.4.5'
 }
 
 configurations.all {
@@ -105,6 +110,24 @@ jar {
 loom {
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
+}
+
+tasks.register('copyBtwJar', Copy) {
+    def depInter = dependencies.create("btw.community:btw-fabric:${project.btw_version}:intermediary")
+    def depDoc = dependencies.create("btw.community:btw-fabric:${project.btw_version}:javadoc")
+
+    def config = configurations.detachedConfiguration(depInter, depDoc)
+    config.transitive = false
+
+    from config
+    into file("build_BTW/tmp/BTW_dev")
+
+    rename { String fileName ->
+        if (fileName.contains("javadoc")) {
+            return "BTW-CE-Intermediary-javadoc.jar"
+        }
+        return "BTW-CE-Intermediary.jar"
+    }
 }
 
 class BTWJarReplacer implements MinecraftJarProcessor<Spec> {

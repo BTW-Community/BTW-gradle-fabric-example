@@ -10,11 +10,12 @@ echo Please wait...
 %SystemRoot%\System32\tar.exe -xf mavenRepo/btw/community/mappings/%MAPPINGS_VERSION%/mappings-%MAPPINGS_VERSION%.jar -C custom_mappings
 del "%userprofile%\.gradle\caches\fabric-loom\1.6.4\minecraft-merged-intermediary.jar"
 java -jar libs/tiny-remapper-0.8.6+local-fat.jar "%userprofile%/.gradle/caches/fabric-loom/1.6.4/minecraft-merged.jar" "%userprofile%/.gradle/caches/fabric-loom/1.6.4/minecraft-merged-intermediary.jar" "%userprofile%/.gradle/caches/fabric-loom/1.6.4/intermediary-v2.tiny" official intermediary >nul
-%SystemRoot%\System32\tar.exe -xf "%~f1" -C build_BTW/tmp/BTW_dev
-java -jar libs/tiny-remapper-0.8.6+local-fat.jar "build_BTW/tmp/BTW_dev/BTW-CE-Intermediary.zip" "build_BTW/BTW_dev/BTW-CE-Intermediary.zip" custom_mappings/mappings/mappings.tiny intermediary named "%userprofile%/.gradle/caches/fabric-loom/1.6.4/minecraft-merged-intermediary.jar" >nul
+call gradlew.bat --no-daemon copyBtwJar
+echo Please wait...
+java -jar libs/tiny-remapper-0.8.6+local-fat.jar "build_BTW/tmp/BTW_dev/BTW-CE-Intermediary.jar" "build_BTW/BTW_dev/BTW-CE-Intermediary.jar" custom_mappings/mappings/mappings.tiny intermediary named "%userprofile%/.gradle/caches/fabric-loom/1.6.4/minecraft-merged-intermediary.jar" >nul
 %SystemRoot%\System32\tar.exe -xf "%userprofile%/.gradle/caches/fabric-loom/minecraftMaven/net/minecraft/minecraft-merged/1.6.4-btw.community.mappings.1_6_4.%MAPPINGS_VERSION%-v2/minecraft-merged-1.6.4-btw.community.mappings.1_6_4.%MAPPINGS_VERSION%-v2.jar" -C build_BTW/BTW_dev
-%SystemRoot%\System32\tar.exe -xf "build_BTW/BTW_dev/BTW-CE-Intermediary.zip" -C build_BTW/BTW_dev
-del build_BTW\BTW_dev\BTW-CE-Intermediary.zip
+%SystemRoot%\System32\tar.exe -xf "build_BTW/BTW_dev/BTW-CE-Intermediary.jar" -C build_BTW/BTW_dev
+del build_BTW\BTW_dev\BTW-CE-Intermediary.jar
 cd build_BTW\BTW_dev
 %SystemRoot%\System32\tar.exe -a -cf ../BTW_dev.zip *
 cd ..

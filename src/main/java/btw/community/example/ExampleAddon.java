@@ -1,7 +1,7 @@
 package btw.community.example;
 
-import btw.AddonHandler;
-import btw.BTWAddon;
+import api.AddonHandler;
+import api.BTWAddon;
 
 public class ExampleAddon extends BTWAddon {
     private static ExampleAddon instance;

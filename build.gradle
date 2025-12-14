@@ -24,9 +24,6 @@ repositories {
 		name = 'Babric'
 		url = 'https://maven.glass-launcher.net/babric'
 	}
-	maven {
-		url file('mavenRepo')
-	}
     maven {
         url 'https://btw-community.github.io/btw-mvn/'
     }

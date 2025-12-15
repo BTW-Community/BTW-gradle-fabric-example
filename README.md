@@ -10,8 +10,7 @@
 ## Quick start guide
 
 * Clone this repository
-* Download the according BTW-CE 3.0+ *intermediary* release
-* Drag&Drop the intermediary .zip file onto the *install.bat*
+* Launch the *install.bat*
 * Wait till it fully finishes
 * Run the gradle task *build* and then *runClient*
 

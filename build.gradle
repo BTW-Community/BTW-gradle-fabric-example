@@ -25,6 +25,9 @@ repositories {
 		url = 'https://maven.glass-launcher.net/babric'
 	}
     maven {
+        url = "https://api.modrinth.com/maven"
+    }
+    maven {
         url 'https://btw-community.github.io/btw-mvn/'
     }
 	mavenCentral() //For fastutil
@@ -110,10 +113,11 @@ loom {
 }
 
 tasks.register('copyBtwJar', Copy) {
-    def depInter = dependencies.create("btw.community:btw-fabric:${project.btw_version}:intermediary")
-    def depDoc = dependencies.create("btw.community:btw-fabric:${project.btw_version}:javadoc")
+    def depInter = dependencies.create("maven.modrinth:btwce:${project.btw_version}:intermediary")
+    def depDoc = dependencies.create("maven.modrinth:btwce:${project.btw_version}:javadoc")
+    def depMappings = dependencies.create("btw.community:mappings:1.0.3")
 
-    def config = configurations.detachedConfiguration(depInter, depDoc)
+    def config = configurations.detachedConfiguration(depInter, depDoc, depMappings)
     config.transitive = false
 
     from config
@@ -122,6 +126,9 @@ tasks.register('copyBtwJar', Copy) {
     rename { String fileName ->
         if (fileName.contains("javadoc")) {
             return "BTW-CE-Intermediary-javadoc.jar"
+        }
+        if (fileName.contains("mappings")) {
+            return "BTW-CE-mappings.jar"
         }
         return "BTW-CE-Intermediary.jar"
     }

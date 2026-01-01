@@ -1,0 +1,35 @@
+plugins {
+    id 'java-gradle-plugin'
+}
+
+repositories {
+    maven {
+        name = "Fabric"
+        url = "https://maven.fabricmc.net/"
+    }
+    maven {
+        name = "legacy-fabric"
+        url = "https://maven.legacyfabric.net/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    implementation("net.fabricmc:fabric-loom:1.14-SNAPSHOT")
+    implementation("net.legacyfabric:legacy-looming:1.14-SNAPSHOT")
+//    implementation("commons-codec:commons-codec:1.16.1")
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+gradlePlugin {
+    plugins {
+        btwGradle {
+            id = 'btw-gradle'
+            implementationClass = 'btw.community.gradle.BTWGradlePlugin'
+        }
+    }
+}

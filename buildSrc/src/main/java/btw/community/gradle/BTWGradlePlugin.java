@@ -7,6 +7,8 @@ import org.gradle.api.plugins.PluginAware;
 public class BTWGradlePlugin implements Plugin<PluginAware> {
     @Override
     public void apply(PluginAware target) {
+        target.getPluginManager().apply(BTWRepositoryHandler.class);
+
         if (target instanceof Project project) {
             project.getExtensions().create(BTWGradleExtensionAPI.class, "btw", BTWGradleExtensionImpl.class, project);
         }

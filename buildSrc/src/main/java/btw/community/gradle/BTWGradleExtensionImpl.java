@@ -27,6 +27,11 @@ public class BTWGradleExtensionImpl implements BTWGradleExtensionAPI {
         project.getDependencies().addProvider(Constants.BTW_CONFIGURATION, this.version.map(v -> "maven.modrinth:btwce:" + v + ":intermediary"));
         project.getDependencies().addProvider(Constants.BTW_JAVADOC_CONFIGURATION, this.version.map(v -> "maven.modrinth:btwce:" + v + ":javadoc"));
 
+        project.getDependencies().add(Constants.BASE_IMPLEMENTATION_CONFIGURATION, "org.apache.logging.log4j:log4j-core:2.19.0");
+        project.getDependencies().add(Constants.BASE_IMPLEMENTATION_CONFIGURATION, "org.apache.logging.log4j:log4j-api:2.19.0");
+        project.getDependencies().add(Constants.BASE_IMPLEMENTATION_CONFIGURATION, "it.unimi.dsi:fastutil:8.5.12");
+        project.getDependencies().add(Constants.BASE_IMPLEMENTATION_CONFIGURATION, "com.typesafe:config:1.4.5");
+
         loom.addMinecraftJarProcessor(BTWProcessor.class, this);
     }
 

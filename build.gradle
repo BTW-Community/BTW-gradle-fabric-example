@@ -65,8 +65,6 @@ dependencies {
 	// This is what MC 1.6 uses
 	implementation 'com.google.code.gson:gson:2.2.2'
 
-	implementation group: 'it.unimi.dsi', name: 'fastutil', version: '8.5.12'
-
     implementation 'com.typesafe:config:1.4.5'
 }
 

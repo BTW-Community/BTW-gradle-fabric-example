@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "${mod_id}",
   "version": "${version}",
-  "name": "Example Mod",
+  "name": "${name}",
   "description": "This is an example description! Tell everyone what your mod is about!",
   "authors": [
     "Me!"
@@ -27,6 +27,7 @@
   ],
   "depends": {
     "fabricloader": ">=0.14.19",
-    "minecraft": "1.6.4"
+    "minecraft": "${minecraft_version}",
+    "btw": "${btw_version}"
   }
 }

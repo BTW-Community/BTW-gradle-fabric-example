@@ -28,6 +28,6 @@
   "depends": {
     "fabricloader": ">=0.14.19",
     "minecraft": "${minecraft_version}",
-    "btw": "${btw_version}"
+    "btw": ">=${btw_version}"
   }
 }

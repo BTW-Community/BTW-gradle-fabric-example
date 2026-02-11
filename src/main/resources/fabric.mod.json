@@ -22,6 +22,9 @@
       "btw.community.example.ExampleAddon"
     ]
   },
+  "custom": {
+    "btw:addon_prefix": "EX"
+  },
   "mixins": [
     "modid.mixins.json"
   ],

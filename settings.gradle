@@ -8,6 +8,10 @@ pluginManagement {
 			url = 'https://maven.fabricmc.net/'
 		}
 		maven {
+			name = "legacy-fabric"
+			url = "https://maven.legacyfabric.net/"
+		}
+		maven {
 			name = 'Jitpack'
 			url = 'https://jitpack.io'
 		}

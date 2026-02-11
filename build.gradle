@@ -1,189 +1,107 @@
-import net.fabricmc.loom.api.processor.MinecraftJarProcessor
-import net.fabricmc.loom.api.processor.ProcessorContext
-import net.fabricmc.loom.api.processor.SpecContext
-
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption;
 plugins {
-	id 'maven-publish'
-	id 'fabric-loom' version "1.4-SNAPSHOT"
+//    id "fabric-loom" version "${loom_version}"
+//    id "legacy-looming" version "${loom_version}" // Version must be the same as fabric-loom's
+    id "maven-publish"
 }
 
-archivesBaseName = project.archives_base_name
+apply plugin: "net.fabricmc.fabric-loom-remap"
+apply plugin: "legacy-looming"
+apply plugin: "btw-gradle"
+
 version = project.mod_version
 group = project.maven_group
 
+base {
+    archivesName = project.archives_base_name
+}
+
 repositories {
-	maven {
-		name = 'legacy-fabric'
-		url = 'https://maven.legacyfabric.net'
-	}
-	// Fixed LWJGL on Linux
-	maven {
-		name = 'Babric'
-		url = 'https://maven.glass-launcher.net/babric'
-	}
-    maven {
-        url = "https://api.modrinth.com/maven"
-    }
-    maven {
-        url 'https://btw-community.github.io/btw-mvn/'
-    }
-	mavenCentral() //For fastutil
+    // Add repositories to retrieve artifacts from in here.
+    // You should only use this when depending on other mods because
+    // Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html
+    // for more information about repositories.
+
+    // Uncomment when using Legacy Fabric API
+    // maven { url = "https://maven.bawnorton.com/releases" }
 }
 
 loom {
-	setIntermediaryUrl('https://maven.legacyfabric.net/net/legacyfabric/intermediary/%1$s/intermediary-%1$s-v2.jar');
-	//accessWidenerPath = file('src/main/resources/<NAME>.accesswidener')
-	addMinecraftJarProcessor(
-			BTWJarReplacer, "BTWJarReplacer", projectDir.toString()
-	)
 }
 
-def lwjglVersion = System.getProperty("os.name").toLowerCase().contains("mac") ? "2.9.1" : "2.9.0"
+legacyLooming {
+}
+
+btw {
+    version = project.btw_version
+}
 
 dependencies {
-	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings "btw.community:mappings:1.0.3"
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "btw.community:mappings:1.0.3"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    // Better Than Wolves already provides a lot of hooks, but you can additionally rely on Legacy Fabric own API if you wish to.
+    // Legacy Fabric API provides hooks for events, item registration, and more. As most mods will need this, it's included by default.
+    // If you know for a fact you don't, it's not required and can be safely removed.
+    // Check availability for your MC version at https://legacyfabric.net/usage.html
+    // modImplementation "net.legacyfabric.legacy-fabric-api:legacy-fabric-api:1.13.2+1.6.4"
 
-	implementation 'net.fabricmc:fabric-loom:1.4-SNAPSHOT'
+    // Uncomment when using Legacy Fabric API
+    // modImplementation "maven.modrinth:legacy-fabric-api-fixes-btw:1.1.0"
+    // modRuntimeOnly("com.github.bawnorton.mixinsquared:mixinsquared-fabric:0.2.0")
 
-	implementation 'org.apache.logging.log4j:log4j-core:2.19.0'
-	implementation 'org.apache.logging.log4j:log4j-api:2.19.0'
-
-	implementation "org.lwjgl.lwjgl:lwjgl_util:${lwjglVersion}"
-	implementation "org.lwjgl.lwjgl:lwjgl:${lwjglVersion}"
-	implementation "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}"
-
-	implementation fileTree(dir: "libs", include: "**.zip")
-
-	implementation 'com.google.guava:guava:14.0.1'
-
-	// This is what MC 1.6 uses
-	implementation 'com.google.code.gson:gson:2.2.2'
-
-	implementation group: 'it.unimi.dsi', name: 'fastutil', version: '8.5.12'
-
-    implementation 'com.typesafe:config:1.4.5'
-}
-
-configurations.all {
-	resolutionStrategy {
-		dependencySubstitution {
-			substitute module('org.lwjgl.lwjgl:lwjgl_util:2.9.1-nightly-20130708-debug3') with {
-				module("org.lwjgl.lwjgl:lwjgl_util:${lwjglVersion}")
-			}
-			substitute module('org.lwjgl.lwjgl:lwjgl:2.9.1-nightly-20130708-debug3') with {
-				module("org.lwjgl.lwjgl:lwjgl:${lwjglVersion}")
-			}
-		}
-		force "org.lwjgl.lwjgl:lwjgl-platform:${lwjglVersion}"
-	}
+    // You can retrieve a specific api module using this notation.
+    // modImplementation(legacy.apiModule("legacy-fabric-item-groups-v1", project.fabric_version))
 }
 
 processResources {
-	inputs.property "version", project.version
-	filesMatching("fabric.mod.json") {
-		expand "version": project.version
-	}
-}
+    inputs.property "version", project.version
 
-tasks.withType(JavaCompile).configureEach {
-	it.options.encoding = "UTF-8"
-}
-
-java {
-	withSourcesJar()
-}
-
-jar {
-	from sourceSets.main.output.resourcesDir
-	from sourceSets.main.output.classesDirs
-	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
-	}
-}
-
-loom {
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
-}
-
-tasks.register('copyBtwJar', Copy) {
-    def depInter = dependencies.create("maven.modrinth:btwce:${project.btw_version}:intermediary")
-    def depDoc = dependencies.create("maven.modrinth:btwce:${project.btw_version}:javadoc")
-    def depMappings = dependencies.create("btw.community:mappings:1.0.3")
-
-    def config = configurations.detachedConfiguration(depInter, depDoc, depMappings)
-    config.transitive = false
-
-    from config
-    into file("build_BTW/tmp/BTW_dev")
-
-    rename { String fileName ->
-        if (fileName.contains("javadoc")) {
-            return "BTW-CE-Intermediary-javadoc.jar"
-        }
-        if (fileName.contains("mappings")) {
-            return "BTW-CE-mappings.jar"
-        }
-        return "BTW-CE-Intermediary.jar"
+    filesMatching("fabric.mod.json") {
+        expand "version": inputs.properties.version
     }
 }
 
-class BTWJarReplacer implements MinecraftJarProcessor<Spec> {
-	String name
-	String path
+tasks.withType(JavaCompile).configureEach {
+    // Ensure that the encoding is set to UTF-8, no matter what the system default is
+    // this fixes some edge cases with special characters not displaying correctly
+    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+    it.options.encoding = "UTF-8"
+}
 
-	@javax.inject.Inject
-	BTWJarReplacer(String name, String path) {
-		this.name = name
-		this.path = path
-	}
+java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
 
-	@Override
-	Spec buildSpec(SpecContext context) {
-		return new Spec(path)
-	}
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
-	@Override
-	void processJar(java.nio.file.Path jar, Spec spec, ProcessorContext context) throws IOException {
-		// Replace the Minecraft jar with the custom one from BTW_dev.
-		// This is just a straight up file replacement, no remapping or anything.
-		if (!Files.exists(Paths.get(path, "build_BTW/BTW_dev/BTW_dev.zip"))) {
-			// Print a warning if the BTW_dev zip doesn't exist.
-			System.err.println("BTW_dev zip not found, skipping BTWJarReplacer")
-		} else {
-			System.out.println("BTW_dev zip found, replacing Minecraft jar with BTW_dev jar.")
-			Files.copy(Paths.get(path, "build_BTW/BTW_dev/BTW_dev.zip"), jar, StandardCopyOption.REPLACE_EXISTING)
-			// Add Javadocs
-			Files.copy(Paths.get(path, "build_BTW/BTW_dev/BTW_dev-javadoc.jar"), jar.resolveSibling(jar.getFileName().toString().replace(".jar", "-javadoc.jar")), StandardCopyOption.REPLACE_EXISTING)
-		}
-	}
+jar {
+    inputs.property "archivesName", project.base.archivesName
 
-	@Override
-	String getName() {
-		return name
-	}
+    from("LICENSE") {
+        rename { "${it}_${inputs.properties.archivesName}"}
+    }
+}
 
-	class Spec implements MinecraftJarProcessor.Spec {
-		String path
+// configure the maven publication
+publishing {
+    publications {
+        create("mavenJava", MavenPublication) {
+            artifactId = project.archives_base_name
+            from components.java
+        }
+    }
 
-		Spec(String path) {
-			this.path = path
-		}
-
-		@Override
-		int hashCode() {
-			if (!Files.exists(Paths.get(path, "build_BTW/BTW_dev/BTW_dev.zip"))) {
-				return name.hashCode()
-			} else {
-				return Files.getLastModifiedTime(Paths.get(path, "build_BTW/BTW_dev/BTW_dev.zip")).hashCode() ^ name.hashCode()
-			}
-		}
-	}
-
+    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
+    repositories {
+        // Add repositories to publish to here.
+        // Notice: This block does NOT have the same function as the block in the top level.
+        // The repositories here will be used for publishing your artifact, not for
+        // retrieving dependencies.
+    }
 }

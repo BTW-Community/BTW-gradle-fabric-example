@@ -26,7 +26,7 @@
     "btw:addon_prefix": "EX"
   },
   "mixins": [
-    "modid.mixins.json"
+    "${mod_id}.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.19",

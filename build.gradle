@@ -83,15 +83,16 @@ configurations.all {
 }
 
 processResources {
-	inputs.property "version", project.version
-	filesMatching("fabric.mod.json") {
-		expand (
+	def expandedInfo = [
 			"version": project.version,
 			"name": project.name,
 			"btw_version": btw_version,
 			"minecraft_version": minecraft_version,
 			"mod_id": mod_id
-		)
+	]
+	inputs.properties expandedInfo
+	filesMatching("fabric.mod.json") {
+		expand expandedInfo
 	}
 }
 

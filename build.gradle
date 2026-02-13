@@ -65,8 +65,6 @@ dependencies {
 	// This is what MC 1.6 uses
 	implementation 'com.google.code.gson:gson:2.2.2'
 
-	implementation group: 'it.unimi.dsi', name: 'fastutil', version: '8.5.12'
-
     implementation 'com.typesafe:config:1.4.5'
 }
 
@@ -85,9 +83,16 @@ configurations.all {
 }
 
 processResources {
-	inputs.property "version", project.version
+	def expandedInfo = [
+			"version": project.version,
+			"name": project.name,
+			"btw_version": btw_version,
+			"minecraft_version": minecraft_version,
+			"mod_id": mod_id
+	]
+	inputs.properties expandedInfo
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand expandedInfo
 	}
 }
 
